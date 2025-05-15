@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Crafter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Backgrounds */
+            --primary-bg: #fff4e6;
+            /* Soft warm background */
+            --secondary-bg: #f9cb9a;
+            /* Slightly richer warm background */
+
+            /* Text Colors */
+            --primary-text: #1a1a1a;
+            /* Strong black text */
+            --secondary-text: #333333;
+            /* Dark neutral gray */
+            --text-dark: #1a1a1a;
+            --text-medium: #2e2e2e;
+            --text-light: #555555;
+
+            /* Vibrant Accents */
+            --accent-color-hov: #ff9f43;
+            /* Vivid amber orange */
+            --accent-green: #2ecc71;
+            /* Vibrant mint green */
+            --accent-contrast-hov: #e86c28;
+            /* Deeper orange for contrast */
+            --accent-color: #ff9e4377;
+            --accent-contrast: #e86b2857;
+            /* Surfaces */
+            --surface-light: #ffffff;
+            /* White cards & sections */
+            --surface-medium: #fff1e6;
+            /* Light amber tone for soft panels */
+            --navfooter-bg: #ffb78aab;
+            /* Borders */
+            --border-dark: #e86c28;
+            --border-medium: #ffc285;
+            --border-light: #ffe0bd;
+            --border-color: #ffbc7b;
+
+            /* Status Colors */
+            --success-green: #2ecc71;
+            /* Mint success color */
+            --danger-red: #e63946;
+            /* Bright red for errors */
+
+            /* Shadows & Effects */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --paper-shadow-color: rgba(255, 159, 67, 0.2);
+            /* amber-tinted shadow */
+
+            /* Transitions */
+            --transition-duration: 0.25s;
+        }
+
+
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 0px;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            height: 87.5vh;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+
+
+        .form {
+            width: 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            background-color: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            transition: background-color 0.5s ease-in-out;
+        }
+
+        .form-container {
+            min-height: 90%;
+            width: 75%;
+            padding: 20px;
+            margin: 30px;
+            background-color: var(--primary-bg);
+            overflow-y: auto;
+            box-shadow: 3px 0 15px var(--shadow-color);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .form-container::-webkit-scrollbar {
+            display: none;
+        }
+
+
+        .preview-container {
+            width: 90%;
+            padding: 10px 10px 30px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            flex-direction: column;
+            transition: background-color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .preview-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .preview-container .live {
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1.5px solid var(--border-dark);
+            border-radius: 8px;
+            background-color: var(--surface-medium);
+            color: var(--text-dark);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out;
+        }
+
+
+        .a4-paper {
+            width: 210mm;
+            height: 100%;
+            padding: 20mm;
+            background-color: var(--primary-bg);
+            box-shadow: 0 0 20px var(--paper-shadow-color);
+            box-sizing: border-box;
+            border-radius: 10px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            border: 2px solid var(--border-dark);
+            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper::-webkit-scrollbar {
+            display: none;
+        }
+
+
+        /* Resume Content Styling - Professional Look */
+        .a4-paper h1 {
+            font-size: 28pt;
+            margin-top: 0;
+            margin-bottom: 0pt;
+            text-align: center;
+            color: var(--text-dark);
+            font-weight: 700;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .job-title {
+            font-size: 12pt;
+            margin-top: 2pt;
+            margin-bottom: 8pt;
+            text-align: center;
+            color: var(--text-medium);
+            font-weight: 400;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .links-section {
+            text-align: center;
+            margin-bottom: 10pt;
+            font-size: 9pt;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .links-section a {
+            margin: 0 6pt;
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: text-decoration 0.2s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .links-section a:hover {
+            text-decoration: underline;
+        }
+
+        .a4-paper hr {
+            margin-top: 10pt;
+            margin-bottom: 12pt;
+            border: 0;
+            border-top: 0.75pt solid var(--border-light);
+            transition: border-top-color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper h2 {
+            font-size: 14pt;
+            margin-top: 14pt;
+            margin-bottom: 6pt;
+            border-bottom: 1pt solid var(--border-light);
+            padding-bottom: 3pt;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s ease-in-out, border-bottom-color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section {
+            font-size: 10pt;
+            line-height: 1.45;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item {
+            margin-bottom: 8pt;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item h3 {
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 2pt;
+            color: var(--secondary-color);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item h3 .project-link {
+            font-size: 9pt;
+            font-weight: normal;
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: text-decoration 0.2s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item h3 .project-link:hover {
+            text-decoration: underline;
+        }
+
+        .a4-paper .resume-section .section-item p {
+            margin: 2pt 0 3pt 0;
+            font-size: 10pt;
+            color: var(--text-medium);
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item .dates {
+            font-style: italic;
+            font-size: 9pt;
+            color: var(--text-light);
+            margin: 1pt 0 3pt 0;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .a4-paper .resume-section .section-item ul {
+            padding-left: 15pt;
+            margin: 2pt 0 4pt 0;
+            font-size: 10pt;
+            line-height: 1.4;
+            list-style-type: disc;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+
+        /* Form Styles - Professional & Clean */
+        .form-container>h3:first-of-type {
+            font-size: 25px;
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            transition: color 0.3s ease-in-out, border-bottom-color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .form-container .form-section-title {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+            transition: color 0.3s ease-in-out, border-bottom-color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .form-container label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-medium);
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="url"],
+        .form-container textarea {
+            width: 100%;
+            padding: 10px 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-medium);
+            border-radius: 5px;
+            font-size: 14px;
+            color: var(--text-dark);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .form-container input[type="text"]:focus,
+        .form-container input[type="url"]:focus,
+        .form-container textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .form-container textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-container .checkbox-group {
+            margin-bottom: 20px;
+            padding-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            display: none;
+        }
+
+
+        .checkbox-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            background: var(--surface-medium);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-medium);
+            transition: background 0.3s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+
+        .checkbox-group label::after {
+            content: "";
+            width: 25px;
+            height: 25px;
+            border-radius: 999px;
+            position: relative;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group label::after::before {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--surface-light);
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked+label::after {
+            background-color: var(--primary-color);
+        }
+
+        .checkbox-group input[type="checkbox"]:checked+label::after::before {
+            transform: translateX(20px);
+        }
+
+        /* Section Toggle for Dynamic Lists */
+        .section-toggle {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background-color: var(--background-light);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .section-toggle:hover {
+            background-color: var(--background-medium);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-toggle .form-section-title {
+            margin-top: 0;
+            font-size: 16px;
+            color: var(--accent-blue);
+            border-bottom: none;
+            margin-bottom: 12px;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* Dynamic List Items */
+        .dynamic-list .list-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            background-color: var(--primary-bg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .dynamic-list .list-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dynamic-list .list-item .inputs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .dynamic-list .list-item input[type="text"],
+        .dynamic-list .list-item input[type="url"],
+        .dynamic-list .list-item textarea {
+            width: auto;
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .dynamic-list .list-item textarea {
+            min-height: 70px;
+            margin-bottom: 0;
+            resize: vertical;
+        }
+
+        .dynamic-list .list-item label {
+            font-size: 13.5px;
+            margin-top: 5px;
+            margin-bottom: 3px;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .dynamic-list .list-item label:first-child {
+            margin-top: 0;
+        }
+
+        .dynamic-list button {
+            padding: 9px 15px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.5s ease-in-out;
+            align-self: flex-start;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .dynamic-list button:active {
+            transform: translateY(1px);
+        }
+
+        .dynamic-list button.remove-item-btn {
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border: none;
+            border-radius: 6px;
+            background-image: url('Cross.png');
+            background-size: 90%;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            padding: 0;
+            transition: background-color 0.3s ease, opacity 0.5s ease-in-out;
+            margin-left: 12px;
+        }
+
+        .dynamic-list button.remove-item-btn:hover {
+            background-color: rgba(var(--danger-red), 0.1);
+        }
+
+
+
+        /* Export Button Styles */
+        .export-buttons {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: opacity 0.5s ease-in-out, border-top-color 0.3s ease-in-out;
+        }
+
+        .export-buttons button {
+            flex-grow: 1;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #export-png-btn {
+            background-color: var(--accent-color);
+            color: var(--text-dark);
+        }
+
+        #export-png-btn:hover {
+            background-color: var(--accent-color-hov);
+            box-shadow: 0 3px 8px rgba(var(--accent-color-hov), 0.2);
+        }
+
+        #export-pdf-btn {
+            max-width: 30%;
+            background-color: var(--accent-contrast);
+            color: white;
+        }
+
+        #export-pdf-btn:hover {
+            background-color: var(--accent-contrast-hov);
+            box-shadow: 0 3px 8px rgba(var(--accent-contrast-hov), 0.2);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+            vertical-align: text-bottom;
+            margin-left: 8px;
+            color: white;
+            transition: color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        @keyframes spinner-border {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .add-item-btn {
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border: none;
+            border-radius: 6px;
+            background-image: url('Add.png');
+            background-size: 90%;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            padding: 0;
+            transition: background-color 0.3s ease, opacity 0.5s ease-in-out;
+        }
+
+        .add-item-btn:hover {
+            background-color: rgba(var(--success-green), 0.1);
+        }
+
+        /* Focus Styles for Accessibility */
+        button:focus,
+        input:focus,
+        textarea:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+            transition: outline 0.2s ease-in-out;
+        }
+
+        button:focus:not(:focus-visible),
+        input:focus:not(:focus-visible),
+        textarea:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            background: var(--surface-medium);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .checkbox-group label::after {
+            content: "";
+            border: solid 2px var(--border-medium);
+            width: 25px;
+            height: 25px;
+            border-radius: 999px;
+            position: relative;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group label::after::before {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked+label::after {
+            background-color: var(--border-medium);
+        }
+
+        .checkbox-group input[type="checkbox"]:checked+label::after::before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
+        nav,
+        footer {
+            background-color: var(--navfooter-bg);
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 1600px) {
+            .container {
+                flex-direction: column;
+                width: 100vw;
+                height: auto;
+                align-items: center;
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            body {
+                overflow: auto;
+            }
+
+            .form {
+                width: 100%;
+                height: auto;
+                min-height: 50vh;
+            }
+
+            .preview-container {
+                width: 100%;
+                height: auto;
+                min-height: 50vh;
+            }
+
+            .form-container {
+                margin: 15px auto;
+            }
+
+            .a4-paper {
+                max-width: 90vw;
+                min-height: 250mm;
+                padding: 20mm;
+                box-shadow: 0 0 20px var(--paper-shadow-color);
+                box-sizing: border-box;
+                border-radius: 3px;
+                overflow-y: scroll;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            }
+
+            .preview-container {
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            }
+
+            .preview-container h1 {
+                text-align: center;
+            }
+        }
+
+        .logo-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #f97316, #ea580c);
+            background-size: 200% 200%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        /* Optional animated gradient */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav style="top: 0;
+       left: 0;
+       width: 100%;
+       font-size: 25px;
+       border-bottom: 1px solid rgba(255, 255, 255, 0.1);    display: flex;
+       justify-content: space-between;
+       align-items: center;
+       padding: 12px 24px;
+       background-color: var(--navfooter-bg);
+       color: var(--text-dark);
+       gap: 20px; /* gap between elements */">
+<p class="logo-name" style="color: rgb(255, 255, 255); font-size: 35px; text-shadow: 2px 2px 4px rgba(120, 53, 15, 0.8);">
+    Resume Crafter
+  </p>
+  
+        <div class="logo"><p style="color: white; text-shadow: 2px 2px 4px rgba(120, 53, 15, 0.8);">RC</p></div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h3>Personal Information</h3>
+
+            <div class="form-section-title">Personal Details</div>
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" oninput="updatePreview()">
+
+            <label for="job-title">Job Title:</label>
+            <input type="text" id="job-title" oninput="updatePreview()">
+
+            <label for="link1">Link 1 (e.g., LinkedIn):</label>
+            <input type="url" id="link1" placeholder="https://linkedin.com/in/yourprofile" oninput="updatePreview()">
+            <label for="link2">Link 2 (e.g., GitHub):</label>
+            <input type="url" id="link2" placeholder="https://github.com/yourusername" oninput="updatePreview()">
+            <label for="link3">Link 3 (e.g., Portfolio):</label>
+            <input type="url" id="link3" placeholder="https://yourportfolio.com" oninput="updatePreview()">
+
+            <div class="form-section-title">Introduction / Summary</div>
+            <label for="introduction">About:</label>
+            <textarea id="introduction" oninput="updatePreview()"
+                placeholder="A brief 2-3 sentence summary of your professional profile..."></textarea>
+
+
+            <div class="form-section-title">Skills</div>
+            <label for="skills">Skills (one per line):</label>
+            <textarea id="skills" oninput="updatePreview()"
+                placeholder="List keywords and skills, one per line"></textarea>
+
+            <div class="form-section-title">Sections to Include</div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="include-introduction" onchange="toggleSection('introduction', this.checked)"
+                    checked>
+                <label for="include-introduction">Summary</label>
+                <input type="checkbox" id="include-skills" onchange="toggleSection('skills', this.checked)" checked>
+                <label for="include-skills">Skills</label>
+
+                <input type="checkbox" id="include-education" onchange="toggleSection('education', this.checked)"
+                    checked>
+                <label for="include-education">Education</label>
+
+                <input type="checkbox" id="include-experience" onchange="toggleSection('experience', this.checked)"
+                    checked>
+                <label for="include-experience">Experience</label>
+
+                <input type="checkbox" id="include-projects" onchange="toggleSection('projects', this.checked)" checked>
+                <label for="include-projects">Projects</label>
+
+                <input type="checkbox" id="include-certificates" onchange="toggleSection('certificates', this.checked)">
+                <label for="include-certificates">Certificates</label>
+            </div>
+
+            <div id="form-education" class="section-toggle">
+                <div class="form-section-title">Education Details</div>
+                <div id="education-list" class="dynamic-list"></div>
+                <button class="add-item-btn" onclick="addEducationItem()"></button>
+            </div>
+
+            <div id="form-experience" class="section-toggle">
+                <div class="form-section-title">Experience Details</div>
+                <div id="experience-list" class="dynamic-list"></div>
+                <button class="add-item-btn" onclick="addExperienceItem()"></button>
+            </div>
+
+            <div id="form-projects" class="section-toggle">
+                <div class="form-section-title">Project Details</div>
+                <div id="project-list" class="dynamic-list"></div>
+                <button class="add-item-btn" onclick="addProjectItem()"></button>
+            </div>
+
+            <div id="form-certificates" class="section-toggle" style="display: none;">
+                <div class="form-section-title">Certificate Details</div>
+                <div id="certificate-list" class="dynamic-list"></div>
+                <button class="add-item-btn" onclick="addCertificateItem()"></button>
+            </div>
+
+            <div class="export-buttons">
+                <button id="export-pdf-btn" onclick="exportAsNativePDF()">Download PDF <span class="loading-spinner"
+                        style="display:none;"></span></button>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <h1 class="live">Live Preview</h1>
+            <div class="a4-paper" id="resume-preview-content">
+                <h1 id="preview-name"></h1>
+                <p class="job-title" id="preview-job-title"></p>
+
+                <div class="links-section" id="preview-links"></div>
+
+
+                <div id="preview-introduction-section" class="resume-section" style="display:none;">
+                    <h2>About Me</h2>
+                    <div class="section-content" id="introduction-content" style="white-space: pre-wrap;"></div>
+                </div>
+
+
+                <div id="preview-skills-section" class="resume-section" style="display:none;">
+                    <h2>Skills</h2>
+                    <ul id="preview-skills"></ul>
+                </div>
+
+                <div id="preview-education" class="resume-section" style="display:none;">
+                    <h2>Education</h2>
+                    <div class="section-content" id="education-content"></div>
+                </div>
+
+                <div id="preview-experience" class="resume-section" style="display:none;">
+                    <h2>Experience</h2>
+                    <div class="section-content" id="experience-content"></div>
+                </div>
+
+                <div id="preview-projects" class="resume-section" style="display:none;">
+                    <h2>Projects</h2>
+                    <div class="section-content" id="projects-content"></div>
+                </div>
+
+                <div id="preview-certificates" class="resume-section" style="display:none;">
+                    <h2>Certificates</h2>
+                    <div class="section-content" id="certificates-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer style="
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        padding: 12px 0;
+        font-size: 20px;
+        z-index: 1000;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: white; 
+        text-shadow: 2px 2px 4px rgba(120, 53, 15, 0.8);">
+        © Krishna Singh || Resume Crafter || All rights reserved.
+    </footer>
+
+
+    <script>
+        // Destructure jsPDF from the loaded library
+        const { jsPDF } = window.jspdf;
+
+        // --- Loading Spinner Helper ---
+        function toggleButtonLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            const spinner = button.querySelector('.loading-spinner');
+            if (isLoading) {
+                button.disabled = true;
+                if (spinner) spinner.style.display = 'inline-block';
+            } else {
+                button.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+            }
+        }
+
+        // --- Initial Setup on DOM Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial preview update based on default/empty form state
+            updatePreview();
+
+            // Sync initial checkbox states with preview/form section visibility
+            // Added 'introduction' to this list
+            ['introduction', 'skills', 'education', 'experience', 'projects', 'certificates'].forEach(sectionName => {
+                const checkbox = document.getElementById(`include-${sectionName}`);
+                // Ensure checkbox exists before calling toggleSectionUI
+                if (checkbox) {
+                    // Use the main toggleSection function to handle initial state
+                    toggleSection(sectionName, checkbox.checked);
+                }
+            });
+        });
+
+        // --- Main Preview Update Function ---
+        function updatePreview() {
+            // Name
+            document.getElementById('preview-name').textContent = document.getElementById('name').value.trim();
+
+            // Added Job Title Update
+            document.getElementById('preview-job-title').textContent = document.getElementById('job-title').value.trim();
+
+
+            // Links
+            const linksInput = [
+                document.getElementById('link1').value.trim(),
+                document.getElementById('link2').value.trim(),
+                document.getElementById('link3').value.trim()
+            ].filter(link => link !== '');
+            const linksContainer = document.getElementById('preview-links');
+            linksContainer.innerHTML = ''; // Clear previous links
+            if (linksInput.length > 0) {
+                const linkSection = document.querySelector(".links-section");
+
+                // Only create the <hr> if it doesn't already exist
+                if (linkSection && !document.querySelector(".create-hr")) {
+                    const hr = document.createElement("hr");
+                    hr.classList.add("create-hr");
+
+                    linkSection.parentNode.insertBefore(hr, linkSection.nextSibling);
+                }
+                linksInput.forEach((link, index) => {
+                    const a = document.createElement('a');
+                    try {
+                        // Basic check and add https if missing
+                        const url = new URL(link.startsWith('http://') || link.startsWith('https://') ? link : `https://${link}`);
+                        a.href = url.href;
+                        a.target = '_blank'; // Open link in a new tab
+                        let hostname = url.hostname.replace(/^www\./, ''); // Clean up hostname
+                        // Assign friendly names for common sites
+                        if (hostname.includes('linkedin.com')) hostname = 'LinkedIn';
+                        else if (hostname.includes('github.com')) hostname = 'GitHub';
+                        else if (hostname.includes('krishnasinghprojects')) hostname = 'Portfolio';
+                        // Capitalize first letter for others
+                        else hostname = hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1);
+                        a.textContent = hostname;
+                    } catch (e) {
+                        // Handle invalid URLs gracefully
+                        a.href = '#';
+                        a.textContent = 'Invalid Link';
+                        console.warn("Invalid URL entered:", link, e);
+                    }
+                    linksContainer.appendChild(a);
+                    // Add a separator if it's not the last link
+                    if (index < linksInput.length - 1) {
+                        const separator = document.createTextNode(' | '); // Using a pipe as separator
+                        linksContainer.appendChild(separator);
+                    }
+                });
+            }
+
+            // Added Introduction/Summary Update
+            const introText = document.getElementById('introduction').value.trim();
+            const introContentDiv = document.getElementById('introduction-content');
+            const introSectionPreview = document.getElementById('preview-introduction-section');
+            const includeIntroCheckbox = document.getElementById('include-introduction');
+
+            if (includeIntroCheckbox.checked && introText !== '') {
+                introContentDiv.textContent = introText; // Set text content directly to preserve line breaks from textarea
+                introSectionPreview.style.display = 'block';
+            } else {
+                introContentDiv.textContent = '';
+                introSectionPreview.style.display = 'none';
+            }
+
+
+            // Skills Preview Update
+            const skillsText = document.getElementById('skills').value.trim();
+            const skillsList = document.getElementById('preview-skills');
+            const skillsSectionPreview = document.getElementById('preview-skills-section');
+            const includeSkillsCheckbox = document.getElementById('include-skills'); // Get the checkbox
+
+            skillsList.innerHTML = ''; // Clear previous skills
+            // Check if skills section is toggled on AND if there's any text
+            if (includeSkillsCheckbox && includeSkillsCheckbox.checked && skillsText !== '') {
+                skillsText.split('\n').forEach(skill => {
+                    const trimmedSkill = skill.trim();
+                    if (trimmedSkill !== '') {
+                        const li = document.createElement('li');
+                        li.textContent = trimmedSkill;
+                        skillsList.appendChild(li);
+                    }
+                });
+                // Show skills section if checkbox is checked AND list is not empty after processing
+                skillsSectionPreview.style.display = skillsList.children.length > 0 ? 'block' : 'none';
+            } else {
+                // Hide if checkbox is not checked or if there's no text
+                skillsSectionPreview.style.display = 'none';
+            }
+
+
+            // Update dynamic sections preview
+            updateEducationPreview();
+            updateExperiencePreview();
+            updateProjectPreview();
+            updateCertificatePreview();
+        }
+
+        // --- Toggle Form/Preview Sections ---
+        function toggleSection(sectionName, isVisible) {
+            const previewSectionDiv = document.getElementById(`preview-${sectionName}`);
+            // Note: Introduction and Skills don't have separate form toggle divs based on current HTML
+            const formSectionToggleDiv = document.getElementById(`form-${sectionName}`); // Used for dynamic sections form parts
+
+            // Handle preview section visibility
+            if (previewSectionDiv) {
+                previewSectionDiv.style.display = isVisible ? 'block' : 'none';
+            }
+            // Handle form section visibility for dynamic lists
+            if (formSectionToggleDiv) {
+                formSectionToggleDiv.style.display = isVisible ? 'block' : 'none';
+            }
+
+            // For dynamic sections (education, experience, etc.), add a default item if checked and list is empty
+            if (isVisible && ['education', 'experience', 'projects', 'certificates'].includes(sectionName)) {
+                const list = document.getElementById(`${sectionName}-list`);
+                if (list && list.children.length === 0) {
+                    // Call the specific add function for this section if it exists
+                    const addFunction = window[`add${sectionName.charAt(0).toUpperCase() + sectionName.slice(1)}Item`];
+                    if (typeof addFunction === 'function') {
+                        addFunction(false); // Add item but don't trigger a full updatePreview from here
+                        // Update preview after adding a default item
+                        updatePreview();
+                    }
+                }
+            }
+            // Call updatePreview after a section toggle to re-render based on current state
+            // (This was moved from DOMContentLoaded)
+            updatePreview();
+        }
+
+        // Helper function called by toggleSectionUI initially (kept for clarity but main logic is in toggleSection now)
+        // toggleSection is now the primary handler for checkbox changes
+        function toggleSectionUI(sectionName, isVisible, addDefaultItemIfNeeded = true) {
+            const previewSectionDiv = document.getElementById(`preview-${sectionName}`);
+            const formSectionToggleDiv = document.getElementById(`form-${sectionName}`); // Used for dynamic sections form parts
+
+            if (previewSectionDiv) {
+                previewSectionDiv.style.display = isVisible ? 'block' : 'none';
+            }
+            if (formSectionToggleDiv) {
+                formSectionToggleDiv.style.display = isVisible ? 'block' : 'none';
+            }
+
+            // This part is mostly handled by toggleSection now
+            if (isVisible && addDefaultItemIfNeeded && ['education', 'experience', 'projects', 'certificates'].includes(sectionName)) {
+                const list = document.getElementById(`${sectionName}-list`);
+                if (list && list.children.length === 0) {
+                    const addFunction = window[`add${sectionName.charAt(0).toUpperCase() + sectionName.slice(1)}Item`];
+                    if (typeof addFunction === 'function') {
+                        addFunction(false); // Add item but don't trigger full preview update from here
+                    }
+                }
+            }
+            // No updatePreview call here, as toggleSection or DOMContentLoaded handles the final update
+        }
+
+
+        // --- Dynamic Section Add/Update Functions (Education, Experience, etc.) ---
+        // Helper to create input fields for dynamic items
+        function createDynamicInput(idPrefix, fieldName, placeholder, type = 'text', onInputCallbackName = 'updatePreview') {
+            const label = document.createElement('label');
+            label.htmlFor = `${idPrefix}-${fieldName}`;
+            // Format label text nicely (e.g., "degree-year" -> "Degree year")
+            label.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, ' $1').trim()}:`;
+
+
+            let input;
+            if (type === 'textarea') {
+                input = document.createElement('textarea');
+                input.placeholder = placeholder || `Enter ${fieldName}...`;
+                // Apply pre-wrap style to textarea input on input (doesn't affect how user types, but good practice if needed)
+                // input.style.whiteSpace = 'pre-wrap';
+                // input.style.wordWrap = 'break-word';
+            } else {
+                input = document.createElement('input');
+                input.type = type;
+                input.placeholder = placeholder || `Enter ${fieldName}...`;
+            }
+            input.id = `${idPrefix}-${fieldName}`;
+            // Call the specified global update function on input
+            input.oninput = () => {
+                if (window[onInputCallbackName] && typeof window[onInputCallbackName] === 'function') {
+                    window[onInputCallbackName]();
+                } else {
+                    console.warn(`Callback function "${onInputCallbackName}" not found.`);
+                }
+            };
+            return [label, input];
+        }
+
+        let eduId = 0; // Unique ID counter for education items
+        function addEducationItem(doUpdatePreview = true) {
+            eduId++;
+            const list = document.getElementById('education-list');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'list-item';
+            itemDiv.id = `edu-item-${eduId}`; // Unique ID for the item div
+            const inputsDiv = document.createElement('div');
+            inputsDiv.className = 'inputs';
+
+            // Create input fields for education item
+            inputsDiv.append(...createDynamicInput(`edu-${eduId}`, 'degree', 'B.S. in Computer Science'));
+            inputsDiv.append(...createDynamicInput(`edu-${eduId}`, 'school', 'University of Example'));
+            inputsDiv.append(...createDynamicInput(`edu-${eduId}`, 'year', '2020 or May 2018 - Jun 2022'));
+            inputsDiv.append(...createDynamicInput(`edu-${eduId}`, 'details', '- Relevant coursework...', 'textarea'));
+
+            // Create remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.textContent = '';
+            // Add event listener to remove the item and update the preview
+            removeBtn.onclick = () => {
+                removeListItem(itemDiv.id);
+                updatePreview(); // Call updatePreview after item is removed
+            };
+
+            // Append inputs and button to the item div, then append item div to the list
+            itemDiv.appendChild(inputsDiv);
+            itemDiv.appendChild(removeBtn);
+            list.appendChild(itemDiv);
+
+            // Optionally update the preview after adding, defaults to true
+            if (doUpdatePreview) updatePreview();
+        }
+
+        // Update Education Preview Section
+        function updateEducationPreview() {
+            const isChecked = document.getElementById('include-education').checked; // Check if section is toggled on
+            const contentDiv = document.getElementById('education-content'); // The div where preview content goes
+            const previewSectionDiv = document.getElementById('preview-education'); // The main section preview div
+            contentDiv.innerHTML = ''; // Clear previous content
+
+            // Check if the preview section exists and checkbox is checked
+            if (!previewSectionDiv || !isChecked) {
+                if (previewSectionDiv) previewSectionDiv.style.display = 'none';
+                return;
+            }
+
+            const items = document.getElementById('education-list').children; // Get all dynamic list items
+            let hasContent = false; // Flag to check if any item has actual content
+
+            // Iterate through each dynamic list item
+            for (let item of items) {
+                // Get trimmed values from input fields within the item
+                const degree = item.querySelector(`[id$="-degree"]`)?.value.trim();
+                const school = item.querySelector(`[id$="-school"]`)?.value.trim();
+                const year = item.querySelector(`[id$="-year"]`)?.value.trim();
+                const details = item.querySelector(`[id$="-details"]`)?.value.trim();
+
+                // If any field has content, consider this item valid
+                if (degree || school || year || details) {
+                    hasContent = true; // Mark that there is content in this section
+
+                    const eduDiv = document.createElement('div');
+                    eduDiv.className = 'section-item'; // Class for styling item separation
+
+                    // Build HTML for details list if details exist
+                    let detailsHtml = '';
+                    if (details) {
+                        detailsHtml = '<ul>';
+                        details.split('\n').forEach(d => { // Split by line breaks for list items
+                            const trimmedD = d.trim();
+                            if (trimmedD !== '') detailsHtml += `<li>${trimmedD}</li>`;
+                        });
+                        detailsHtml += '</ul>';
+                    }
+
+                    // Construct the inner HTML for the preview item
+                    eduDiv.innerHTML = `
+                        <h3>${degree || ''}</h3>
+                        <p>${school || ''}</p>
+                        ${year ? `<p class="dates">${year}</p>` : ''}
+                        ${detailsHtml}
+                    `;
+                    contentDiv.appendChild(eduDiv); // Add the constructed item HTML to the preview
+                }
+            }
+            // Show or hide the main preview section based on whether any item had content AND the checkbox is checked
+            previewSectionDiv.style.display = hasContent ? 'block' : 'none';
+        }
+
+        // Similar structure for Experience, Projects, Certificates...
+
+        let expId = 0;
+        function addExperienceItem(doUpdatePreview = true) {
+            expId++;
+            const list = document.getElementById('experience-list');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'list-item';
+            itemDiv.id = `exp-item-${expId}`;
+            const inputsDiv = document.createElement('div');
+            inputsDiv.className = 'inputs';
+
+            inputsDiv.append(...createDynamicInput(`exp-${expId}`, 'title', 'Software Engineer'));
+            inputsDiv.append(...createDynamicInput(`exp-${expId}`, 'company', 'Tech Solutions Inc.'));
+            inputsDiv.append(...createDynamicInput(`exp-${expId}`, 'dates', 'Jan 2021 - Present'));
+            inputsDiv.append(...createDynamicInput(`exp-${expId}`, 'description', '- Developed new features...', 'textarea'));
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.textContent = '';
+            removeBtn.onclick = () => { removeListItem(itemDiv.id); updatePreview(); };
+
+            itemDiv.appendChild(inputsDiv);
+            itemDiv.appendChild(removeBtn);
+            list.appendChild(itemDiv);
+            if (doUpdatePreview) updatePreview();
+        }
+
+        function updateExperiencePreview() {
+            const isChecked = document.getElementById('include-experience').checked;
+            const contentDiv = document.getElementById('experience-content');
+            const previewSectionDiv = document.getElementById('preview-experience');
+            contentDiv.innerHTML = '';
+            if (!previewSectionDiv || !isChecked) {
+                if (previewSectionDiv) previewSectionDiv.style.display = 'none';
+                return;
+            }
+
+            const items = document.getElementById('experience-list').children;
+            let hasContent = false;
+            for (let item of items) {
+                const title = item.querySelector(`[id$="-title"]`)?.value.trim();
+                const company = item.querySelector(`[id$="-company"]`)?.value.trim();
+                const dates = item.querySelector(`[id$="-dates"]`)?.value.trim();
+                const desc = item.querySelector(`[id$="-description"]`)?.value.trim();
+                if (title || company || dates || desc) {
+                    hasContent = true;
+                    const expDiv = document.createElement('div');
+                    expDiv.className = 'section-item';
+                    let descHtml = '';
+                    if (desc) {
+                        descHtml = '<ul>';
+                        desc.split('\n').forEach(d => { const trimmedD = d.trim(); if (trimmedD !== '') descHtml += `<li>${trimmedD}</li>`; });
+                        descHtml += '</ul>';
+                    }
+                    expDiv.innerHTML = `
+                        <h3>${title || ''}</h3>
+                        <p>${company || ''}</p>
+                        ${dates ? `<p class="dates">${dates}</p>` : ''}
+                        ${descHtml}
+                    `;
+                    contentDiv.appendChild(expDiv);
+                }
+            }
+            previewSectionDiv.style.display = hasContent ? 'block' : 'none';
+        }
+
+
+        let projId = 0;
+        function addProjectItem(doUpdatePreview = true) {
+            projId++;
+            const list = document.getElementById('project-list');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'list-item';
+            itemDiv.id = `proj-item-${projId}`;
+            const inputsDiv = document.createElement('div');
+            inputsDiv.className = 'inputs';
+
+            inputsDiv.append(...createDynamicInput(`proj-${projId}`, 'name', 'Resume Builder App'));
+            inputsDiv.append(...createDynamicInput(`proj-${projId}`, 'link', 'https://github.com/user/project', 'url'));
+            inputsDiv.append(...createDynamicInput(`proj-${projId}`, 'technologies', 'HTML, CSS, JavaScript'));
+            inputsDiv.append(...createDynamicInput(`proj-${projId}`, 'description', '- Feature 1...', 'textarea'));
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.textContent = '';
+            removeBtn.onclick = () => { removeListItem(itemDiv.id); updatePreview(); };
+
+            itemDiv.appendChild(inputsDiv);
+            itemDiv.appendChild(removeBtn);
+            list.appendChild(itemDiv);
+            if (doUpdatePreview) updatePreview();
+        }
+
+        function updateProjectPreview() {
+            const isChecked = document.getElementById('include-projects').checked;
+            const contentDiv = document.getElementById('projects-content');
+            const previewSectionDiv = document.getElementById('preview-projects');
+            contentDiv.innerHTML = '';
+            if (!previewSectionDiv || !isChecked) {
+                if (previewSectionDiv) previewSectionDiv.style.display = 'none';
+                return;
+            }
+
+            const items = document.getElementById('project-list').children;
+            let hasContent = false;
+            for (let item of items) {
+                const name = item.querySelector(`[id$="-name"]`)?.value.trim();
+                const link = item.querySelector(`[id$="-link"]`)?.value.trim();
+                const tech = item.querySelector(`[id$="-technologies"]`)?.value.trim();
+                const desc = item.querySelector(`[id$="-description"]`)?.value.trim();
+
+                if (name || tech || desc || link) {
+                    hasContent = true;
+                    const projDiv = document.createElement('div');
+                    projDiv.className = 'section-item';
+
+                    let descHtml = '';
+                    if (desc) {
+                        descHtml = '<ul>';
+                        desc.split('\n').forEach(d => { const trimmedD = d.trim(); if (trimmedD !== '') descHtml += `<li>${trimmedD}</li>`; });
+                        descHtml += '</ul>';
+                    }
+                    let linkHtml = '';
+                    if (link) {
+                        try {
+                            const url = new URL(link.startsWith('http://') || link.startsWith('https://') ? link : `https://${link}`);
+                            linkHtml = `<a href="${url.href}" target="_blank" class="project-link">View Project</a>`;
+                        } catch (e) {
+                            // Handle invalid URLs for preview link
+                            linkHtml = `<span class="project-link" style="color:grey; cursor: help;">Invalid Link</span>`; // Indicate invalid link
+                            console.warn("Invalid Project URL entered:", link, e);
+                        }
+                    }
+                    // In the preview, we put the link next to the title if space allows (using flexbox)
+                    projDiv.innerHTML = `
+                        <h3>
+                            <span>${name || ''}</span>
+                            ${linkHtml}
+                        </h3>
+                        ${tech ? `<p><em>Technologies: ${tech}</em></p>` : ''}
+                        ${descHtml}
+                    `;
+                    contentDiv.appendChild(projDiv);
+                }
+            }
+            previewSectionDiv.style.display = hasContent ? 'block' : 'none';
+        }
+
+
+        let certId = 0;
+        function addCertificateItem(doUpdatePreview = true) {
+            certId++;
+            const list = document.getElementById('certificate-list');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'list-item';
+            itemDiv.id = `cert-item-${certId}`;
+            const inputsDiv = document.createElement('div');
+            inputsDiv.className = 'inputs';
+
+            inputsDiv.append(...createDynamicInput(`cert-${certId}`, 'name', 'Certified Web Developer'));
+            inputsDiv.append(...createDynamicInput(`cert-${certId}`, 'organization', 'Online Courses Inc.'));
+            inputsDiv.append(...createDynamicInput(`cert-${certId}`, 'date', 'Dec 2022'));
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.textContent = '';
+            removeBtn.onclick = () => { removeListItem(itemDiv.id); updatePreview(); };
+
+            itemDiv.appendChild(inputsDiv);
+            itemDiv.appendChild(removeBtn);
+            list.appendChild(itemDiv);
+            if (doUpdatePreview) updatePreview();
+        }
+
+        function updateCertificatePreview() {
+            const isChecked = document.getElementById('include-certificates').checked;
+            const contentDiv = document.getElementById('certificates-content');
+            const previewSectionDiv = document.getElementById('preview-certificates');
+            contentDiv.innerHTML = '';
+            if (!previewSectionDiv || !isChecked) {
+                if (previewSectionDiv) previewSectionDiv.style.display = 'none';
+                return;
+            }
+
+            const items = document.getElementById('certificate-list').children;
+            let hasContent = false;
+            for (let item of items) {
+                const name = item.querySelector(`[id$="-name"]`)?.value.trim();
+                const org = item.querySelector(`[id$="-organization"]`)?.value.trim();
+                const date = item.querySelector(`[id$="-date"]`)?.value.trim();
+                if (name || org || date) {
+                    hasContent = true;
+                    const certDiv = document.createElement('div');
+                    certDiv.className = 'section-item';
+                    certDiv.innerHTML = `
+                         <h3>${name || ''}</h3>
+                         <p>${org || ''}</p>
+                         ${date ? `<p class="dates">${date}</p>` : ''}
+                     `;
+                    contentDiv.appendChild(certDiv);
+                }
+            }
+            previewSectionDiv.style.display = hasContent ? 'block' : 'none';
+        }
+
+
+        // --- Remove List Item Helper ---
+        function removeListItem(itemId) {
+            const itemToRemove = document.getElementById(itemId);
+            if (itemToRemove) {
+                itemToRemove.remove();
+                // updatePreview() is called by the specific remove button onclick handler
+            }
+        }
+
+        // --- PNG Export Function (Uses html2canvas to render the preview div) ---
+        function exportAsPNG() {
+            toggleButtonLoading('export-png-btn', true);
+            const resumeElement = document.getElementById('resume-preview-content');
+
+            // Save original styles that might affect rendering
+            const originalStyles = {
+                backgroundColor: resumeElement.style.backgroundColor,
+                margin: resumeElement.style.margin,
+                boxShadow: resumeElement.style.boxShadow,
+                transform: resumeElement.style.transform // Save original transform
+            };
+
+            // Apply temporary styles for cleaner capture (white background, no margins/shadows in the capture)
+            resumeElement.style.backgroundColor = 'white';
+            resumeElement.style.margin = '0';
+            resumeElement.style.boxShadow = 'none';
+            resumeElement.style.transform = 'scale(1)'; // Ensure no scaling affects capture
+
+            // Use html2canvas to render the specific div
+            html2canvas(resumeElement, {
+                scale: 2, // Increase scale for higher resolution PNG
+                useCORS: true, // Needed if you have images from different origins
+                logging: false,
+                // onclone allows modifying the cloned DOM before rendering (useful for hiding scrollbars etc.)
+                onclone: (doc) => {
+                    const clonedElement = doc.getElementById('resume-preview-content');
+                    if (clonedElement) {
+                        // Apply temporary styles to the cloned element as well
+                        clonedElement.style.margin = '0';
+                        clonedElement.style.boxShadow = 'none';
+                        clonedElement.style.transform = 'scale(1)';
+                        // Hide scrollbars in the clone if necessary
+                        const formContainerClone = doc.querySelector('.form-container');
+                        const previewContainerClone = doc.querySelector('.preview-container');
+                        if (formContainerClone) formContainerClone.style.overflowY = 'hidden';
+                        if (previewContainerClone) previewContainerClone.style.overflowY = 'hidden';
+
+                        // Ensure elements that might affect layout like the job title or intro are styled correctly in clone
+                        const clonedJobTitle = clonedElement.querySelector('.job-title');
+                        if (clonedJobTitle) {
+                            clonedJobTitle.style.marginTop = '2pt'; // Match CSS if needed for consistency
+                            clonedJobTitle.style.marginBottom = '8pt';
+                        }
+                        const clonedIntroSection = clonedElement.querySelector('#preview-introduction-section');
+                        if (clonedIntroSection) {
+                            clonedIntroSection.style.marginTop = '16pt'; // Match H2 spacing
+                            clonedIntroSection.style.marginBottom = '8pt'; // Space after content
+                        }
+                        // Add any other specific preview styles here for cloning accuracy
+                    }
+                }
+            }).then(canvas => {
+                // Create a temporary link to download the canvas content as PNG
+                const link = document.createElement('a');
+                link.download = 'resume.png';
+                link.href = canvas.toDataURL('image/png'); // Get data URL of the canvas
+                link.click(); // Programmatically click the link to trigger download
+            }).catch(err => {
+                console.error("Error exporting as PNG:", err);
+                alert("Could not export as PNG. Check console for details.");
+            }).finally(() => {
+                // Restore original styles to the live element
+                resumeElement.style.backgroundColor = originalStyles.backgroundColor;
+                resumeElement.style.margin = originalStyles.margin;
+                resumeElement.style.boxShadow = originalStyles.boxShadow;
+                resumeElement.style.transform = originalStyles.transform;
+                // Turn off loading spinner
+                toggleButtonLoading('export-png-btn', false);
+            });
+        }
+
+
+        // --- Native jsPDF Export Function (Reconstructs content from data) ---
+        async function exportAsNativePDF() {
+            toggleButtonLoading('export-pdf-btn', true);
+            const { jsPDF } = window.jspdf; // Ensure jsPDF is accessed correctly
+
+            // Initialize jsPDF document with A4 format
+            const doc = new jsPDF({
+                orientation: 'p', // Portrait
+                unit: 'pt', // Use points as units for precise control
+                format: 'a4' // Set format to A4
+            });
+
+            // --- PDF Document Constants ---
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 40; // Margin in points (approx 14mm)
+            const contentWidth = pageWidth - (2 * margin); // Usable width for content
+            let currentY = margin; // Keep track of the current vertical position
+            const lineSpacing = 4; // Extra spacing between lines of text within a paragraph/list item
+            const sectionTitleSpacingAfter = 10; // Spacing after a major section title (H2 equivalent)
+            const itemSpacing = 12; // Spacing between individual items within a section (e.g., between two education entries)
+            const paragraphSpacing = 8; // Spacing after a paragraph or date line
+            const lineSeparatorHeight = 0.75; // Height of the dividing line in points
+            const lineSeparatorMargin = 8; // Vertical space around the line
+
+
+            // --- Helper function to add text and handle basic page breaks ---
+            // This function splits text that exceeds line width and advances currentY
+            function addText(text, x, options = {}) {
+                if (!text) return currentY; // Don't add empty text
+
+                const fontSize = options.fontSize || 10;
+                const fontStyle = options.fontStyle || 'normal'; // 'normal', 'bold', 'italic', 'bolditalic'
+                const color = options.color || '#000000'; // Text color
+                const align = options.align || 'left'; // 'left', 'center', 'right'
+                const maxWidth = options.maxWidth || contentWidth; // Maximum width for the text line wrapping
+
+                doc.setFontSize(fontSize);
+                doc.setFont('times', fontStyle); // Change to Times New Roman // Using a standard font
+
+                // Set text color - jsPDF setTextColor accepts RGB or grayscale, convert hex
+                if (typeof color === 'string' && color.startsWith('#') && color.length === 7) {
+                    const r = parseInt(color.substring(1, 3), 16);
+                    const g = parseInt(color.substring(3, 5), 16);
+                    const b = parseInt(color.substring(5, 7), 16);
+                    doc.setTextColor(r, g, b);
+                } else if (Array.isArray(color) && color.length === 3) {
+                    doc.setTextColor(color[0], color[1], color[2]);
+                } else {
+                    doc.setTextColor(0, 0, 0); // Default to black
+                }
+
+
+                // Split text into lines that fit within maxWidth
+                const textLines = doc.splitTextToSize(text, maxWidth);
+
+                // Calculate the height needed for this text block
+                const textBlockHeight = textLines.length * (fontSize + lineSpacing) - lineSpacing; // Subtract last lineSpacing
+
+
+                // Check if adding these lines requires a new page
+                if (currentY + textBlockHeight > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin; // Reset Y for the new page
+                }
+
+                let textX = x; // Starting X position
+                if (align === 'center') {
+                    // Calculate X for center alignment based on the longest line
+                    const longestLineWidth = Math.max(...textLines.map(line => doc.getStringUnitWidth(line) * fontSize / doc.internal.scaleFactor));
+                    textX = (pageWidth - longestLineWidth) / 2;
+                } else if (align === 'right') {
+                    // Calculate X for right alignment based on the longest line
+                    const longestLineWidth = Math.max(...textLines.map(line => doc.getStringUnitWidth(line) * fontSize / doc.internal.scaleFactor));
+                    textX = pageWidth - margin - longestLineWidth; // Align longest line to the right margin
+                }
+
+                // Add the text block to the PDF
+                doc.text(textLines, textX, currentY + fontSize); // Start drawing text from currentY + fontSize (baseline)
+
+                // Update currentY based on the height of the added text block
+                currentY += textBlockHeight + lineSpacing; // Add back lineSpacing after the block
+
+
+                doc.setTextColor(0, 0, 0); // Reset color to black after adding text
+                return currentY; // Return the new vertical position
+            }
+
+            // --- Helper function to add a list (like bullet points) ---
+            function addList(items, x, options = {}) {
+                if (!items || items.length === 0) return currentY; // Don't add empty list
+
+                const fontSize = options.fontSize || 10;
+                const bullet = '\u2022'; // Bullet character
+                const bulletIndent = 15; // Space for the bullet
+                const textIndent = x + bulletIndent; // Start text after the bullet + indent
+                const itemMaxWidth = (options.maxWidth || contentWidth) - bulletIndent; // Max width for list item text
+
+                doc.setFontSize(fontSize);
+                doc.setFont('times', 'normal');
+                doc.setTextColor(options.color || '#000000'); // List item color
+
+
+                items.forEach(itemText => {
+                    // Split list item text into lines
+                    const textLines = doc.splitTextToSize(itemText, itemMaxWidth);
+                    const itemBlockHeight = textLines.length * (fontSize + lineSpacing) - lineSpacing;
+
+
+                    // Check for page break before adding the item
+                    if (currentY + itemBlockHeight > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin; // Reset Y on new page
+                    }
+
+                    // Add the bullet point
+                    doc.text(bullet, x, currentY + fontSize); // Position bullet
+
+                    // Add the list item text block
+                    doc.text(textLines, textIndent, currentY + fontSize); // Position text block
+
+                    // Update currentY
+                    currentY += itemBlockHeight + lineSpacing;
+                });
+                currentY += paragraphSpacing / 2; // Add a small gap after list
+
+                doc.setTextColor(0, 0, 0); // Reset color
+                return currentY; // Return the new vertical position
+            }
+
+            // --- Helper function to add a clickable link ---
+            function addLink(text, url, x, options = {}) {
+                if (!text || !url) return currentY; // Don't add empty links
+
+                const fontSize = options.fontSize || 10;
+                const color = options.color || [0, 123, 255]; // Default link color (blue)
+                const fontStyle = options.fontStyle || 'normal';
+
+                doc.setFontSize(fontSize);
+                doc.setFont('times', fontStyle);
+
+                // Set text color
+                if (typeof color === 'string' && color.startsWith('#') && color.length === 7) {
+                    const r = parseInt(color.substring(1, 3), 16);
+                    const g = parseInt(color.substring(3, 5), 16);
+                    const b = parseInt(color.substring(5, 7), 16);
+                    doc.setTextColor(r, g, b);
+                } else if (Array.isArray(color) && color.length === 3) {
+                    doc.setTextColor(color[0], color[1], color[2]);
+                } else {
+                    doc.setTextColor(0, 123, 255); // Default to blue
+                }
+
+                // Split text into lines
+                const textLines = doc.splitTextToSize(text, options.maxWidth || contentWidth);
+                const textBlockHeight = textLines.length * (fontSize + lineSpacing) - lineSpacing;
+
+
+                // Check for page break
+                if (currentY + textBlockHeight > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin; // Reset Y on new page
+                }
+
+                // Add the clickable text link block
+                doc.textWithLink(textLines.join('\n'), x, currentY + fontSize, { url: url });
+
+                // Update currentY
+                currentY += textBlockHeight + lineSpacing;
+
+                doc.setTextColor(0, 0, 0); // Reset color
+                return currentY; // Return the new vertical position
+            }
+
+
+            function addHorizontalLine() {
+                currentY += lineSeparatorMargin; // Space before the line
+                // Check for page break before drawing the line
+                if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin + lineSeparatorMargin; // Reset Y on new page, add initial offset
+                }
+                doc.setDrawColor(200, 200, 200); // Light gray line (RGB)
+                doc.setLineWidth(lineSeparatorHeight); // Set line thickness
+                doc.line(margin, currentY, pageWidth - margin, currentY); // Draw line from left margin to right margin
+                currentY += lineSeparatorMargin; // Add space after the line
+                return currentY; // Return the new vertical position
+            }
+
+            // --- Start Adding Content to PDF ---
+
+            let isFirstSectionAdded = false; // Flag to track if a section has been added to add line before subsequent ones
+
+            // Name (H1 Equivalent) - Centered
+            const nameText = document.getElementById('preview-name').textContent.trim();
+            if (nameText && nameText !== 'Your Name') { // Only add if name is entered
+                currentY = addText(nameText, margin, { fontSize: 24, fontStyle: 'bold', align: 'center', maxWidth: contentWidth });
+                // No spacing here, Job Title comes next
+            }
+
+            // Added Job Title - Centered below name
+            const jobTitleText = document.getElementById('job-title').value.trim();
+            if (jobTitleText) {
+                currentY = addText(jobTitleText, margin, { fontSize: 12, fontStyle: 'normal', color: '#555555', align: 'center', maxWidth: contentWidth });
+                currentY += 8; // Space after Job Title
+            }
+
+
+            // Links - Centered block of clickable links
+            const linksElements = document.getElementById('preview-links').querySelectorAll('a');
+            if (linksElements.length > 0) {
+                let linkObjects = [];
+                linksElements.forEach(a => {
+                    // Only include links that have a valid href (not just '#')
+                    if (a.href && a.href !== window.location.href + '#') {
+                        linkObjects.push({ text: a.textContent, url: a.href });
+                    }
+                });
+
+                if (linkObjects.length > 0) {
+                    const linkFontSize = 9;
+                    doc.setFontSize(linkFontSize);
+                    doc.setFont('times', 'normal');
+                    doc.setTextColor(0, 123, 255); // Blue color for links
+
+                    // Concatenate links with separator for measurement
+                    let linksLineText = linkObjects.map(l => l.text).join(' | ');
+                    const separatorWidth = doc.getStringUnitWidth(' | ') * linkFontSize / doc.internal.scaleFactor; // Width of separator
+
+
+                    // Calculate the width of the entire links line block
+                    let totalLinksContentWidth = 0;
+                    linkObjects.forEach(l => {
+                        totalLinksContentWidth += doc.getStringUnitWidth(l.text) * linkFontSize / doc.internal.scaleFactor;
+                    });
+                    // Add separator width for each separator
+                    totalLinksContentWidth += (linkObjects.length - 1) * separatorWidth;
+
+
+                    // Calculate the starting X position for centering the block
+                    let linkBlockStartX = (pageWidth - totalLinksContentWidth) / 2;
+                    if (linkBlockStartX < margin) linkBlockStartX = margin; // Ensure it doesn't go into the left margin
+
+                    // Check for page break before adding links block
+                    const linkBlockHeight = linkFontSize + lineSpacing; // Approx height of one line of links
+                    if (currentY + linkBlockHeight > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin;
+                        linkBlockStartX = (pageWidth - totalLinksContentWidth) / 2; // Recalculate X on new page
+                        if (linkBlockStartX < margin) linkBlockStartX = margin;
+                    }
+
+                    // Add each link individually with separators
+                    let currentLinkX = linkBlockStartX;
+                    linkObjects.forEach((linkObj, index) => {
+                        // Add the clickable text link
+                        doc.textWithLink(linkObj.text, currentLinkX, currentY + linkFontSize, { url: linkObj.url });
+
+                        // Add separator if not the last link
+                        if (index < linkObjects.length - 1) {
+                            const separatorText = ' | ';
+                            doc.text(separatorText, currentLinkX + doc.getStringUnitWidth(linkObj.text) * linkFontSize / doc.internal.scaleFactor, currentY + linkFontSize);
+                            // Move currentLinkX past the link text and the separator
+                            currentLinkX += (doc.getStringUnitWidth(linkObj.text) * linkFontSize / doc.internal.scaleFactor) + separatorWidth;
+                        } else {
+                            // Just move currentLinkX past the last link
+                            currentLinkX += doc.getStringUnitWidth(linkObj.text) * linkFontSize / doc.internal.scaleFactor;
+                        }
+                    });
+
+
+                    currentY += linkBlockHeight; // Update Y after adding the link block
+                    currentY += 5; // Small gap after links
+
+                    doc.setTextColor(0, 0, 0); // Reset color to black
+                }
+            }
+
+            // Horizontal Line after header block
+            if (nameText || jobTitleText || linksElements.length > 0) { // Only add line if there was content in the header
+                currentY = addHorizontalLine();
+            }
+
+
+            // Array of sections to process in order, including introduction
+            const sectionsToProcess = [
+                { key: 'introduction', title: 'About Me', needsCheckbox: true },
+                { key: 'skills', title: 'Skills', needsCheckbox: true }, // Skills now has a checkbox
+                { key: 'education', title: 'Education', needsCheckbox: true },
+                { key: 'experience', title: 'Experience', needsCheckbox: true },
+                { key: 'projects', title: 'Projects', needsCheckbox: true },
+                { key: 'certificates', title: 'Certificates', needsCheckbox: true }
+            ];
+
+            // Process Dynamic Sections and add lines before each *included* section after the first
+            sectionsToProcess.forEach(sectionInfo => {
+                const sectionKey = sectionInfo.key;
+                const includeCheckbox = document.getElementById(`include-${sectionKey}`);
+                let shouldInclude = false;
+                let sectionContentExists = false;
+
+                // Determine if section should be included and if it has content
+                if (sectionInfo.needsCheckbox) {
+                    shouldInclude = includeCheckbox && includeCheckbox.checked;
+                } else {
+                    // For sections like Skills that were initially based purely on content
+                    // Although we added a checkbox, this logic might be needed for other types later
+                    // shouldInclude = true; // Assume always include if no checkbox requirement
+                }
+
+                // Check if the section actually has content based on the preview div or source data
+                if (sectionKey === 'introduction') {
+                    sectionContentExists = document.getElementById('introduction').value.trim() !== '';
+                } else if (sectionKey === 'skills') {
+                    sectionContentExists = document.getElementById('skills').value.trim() !== '';
+                } else {
+                    // For dynamic lists, check if the corresponding preview section div is visible (meaning it had items with content)
+                    const previewSectionDiv = document.getElementById(`preview-${sectionKey}`);
+                    sectionContentExists = previewSectionDiv && previewSectionDiv.style.display !== 'none';
+                }
+
+
+                // Process section if it's checked (or always included) AND has content
+                if (shouldInclude && sectionContentExists) {
+
+                    // --- Add Horizontal Line BEFORE the section ---
+                    // Add a line before this section ONLY if it's not the very first section being added after the header line
+                    if (isFirstSectionAdded) {
+                        currentY = addHorizontalLine();
+                    }
+
+
+                    // --- Add Section Title ---
+                    const sectionTitleText = sectionInfo.title || (sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1));
+                    currentY = addText(sectionTitleText, margin, { fontSize: 14, fontStyle: 'bold' });
+                    currentY += sectionTitleSpacingAfter; // Space after section title
+
+
+                    // --- Add Section Content ---
+                    if (sectionKey === 'introduction') {
+                        const introText = document.getElementById('introduction').value.trim();
+                        currentY = addText(introText, margin, { fontSize: 10, maxWidth: contentWidth });
+                        currentY += paragraphSpacing; // Space after intro block
+
+                    } else if (sectionKey === 'skills') {
+                        const skillsText = document.getElementById('skills').value.trim();
+                        const skillsItems = skillsText.split('\n').map(skill => skill.trim()).filter(skill => skill !== '');
+                        if (skillsItems.length > 0) {
+                            currentY = addList(skillsItems, margin, { fontSize: 10, maxWidth: contentWidth });
+                        }
+                        currentY += paragraphSpacing; // Space after skills list
+
+                    } else {
+                        // Handle dynamic list sections (Education, Experience, Projects, Certificates)
+                        const previewSectionDiv = document.getElementById(`preview-${sectionKey}`);
+                        const items = previewSectionDiv.querySelectorAll('.section-item'); // Get the individual items from the preview div
+
+                        items.forEach(item => {
+                            // Extract data from the preview item's structure
+                            const h3Element = item.querySelector('h3');
+                            const h3Text = h3Element ? (h3Element.querySelector('span')?.textContent || h3Element.textContent.split('\n')[0]?.trim() || '') : ''; // Get text, avoiding link span
+                            const pElements = item.querySelectorAll('p:not(.dates)');
+                            const companyOrSchool = pElements.length > 0 ? pElements[0].textContent.trim() : '';
+                            const datesElement = item.querySelector('p.dates');
+                            const dates = datesElement ? datesElement.textContent.trim() : '';
+                            const ulElement = item.querySelector('ul');
+                            const listItems = ulElement ? Array.from(ulElement.querySelectorAll('li')).map(li => li.textContent.trim()).filter(t => t) : [];
+                            const projectLinkElement = item.querySelector('h3 a.project-link'); // Get project link from preview HTML
+
+
+                            // Add Title (H3 equivalent)
+                            if (h3Text) {
+                                currentY = addText(h3Text, margin, { fontSize: 11, fontStyle: 'bold', maxWidth: contentWidth });
+                                // Add a small gap after the title before company/school
+                                currentY += paragraphSpacing / 4;
+                            }
+
+                            // Add Company/School
+                            if (companyOrSchool) {
+                                currentY = addText(companyOrSchool, margin, { fontSize: 10, fontStyle: 'normal', maxWidth: contentWidth });
+                                currentY += paragraphSpacing / 4; // Small gap
+                            }
+
+                            // Add Dates (Italic)
+                            if (dates) {
+                                currentY = addText(dates, margin, { fontSize: 9, fontStyle: 'italic', color: '#555555', maxWidth: contentWidth });
+                                currentY += paragraphSpacing / 2; // Space after dates
+                            }
+
+                            // Add Project Link (if exists) - Positioned below dates for simplicity in PDF
+                            if (sectionKey === 'projects' && projectLinkElement && projectLinkElement.href && projectLinkElement.href !== window.location.href + '#') {
+                                const linkText = `${projectLinkElement.textContent}`; // Add descriptive text
+                                const linkUrl = projectLinkElement.href;
+                                currentY = addLink(linkText, linkUrl, margin, { fontSize: 9, fontStyle: 'italic' }); // Use italic for project link line
+                                currentY += paragraphSpacing / 2; // Space after project link line
+                            }
+
+
+                            // Add Description List (Bullet points)
+                            if (listItems.length > 0) {
+                                currentY = addList(listItems, margin, { fontSize: 10, maxWidth: contentWidth });
+                            }
+
+                            // Add space between items within the section, but not after the last item of the section
+                            const isLastItem = item === items[items.length - 1];
+                            if (!isLastItem) {
+                                currentY += itemSpacing;
+                            }
+                        });
+                        // Add space after a whole section's items, handled outside the item loop below
+                    }
+
+                    // Set the flag indicating at least one section has been added
+                    isFirstSectionAdded = true;
+
+                    // Add space after the whole section (only if it wasn't the very last content added on the page, handled implicitly by next element or page break)
+                    // currentY += sectionTitleSpacingAfter; // Already added after title, consider extra space if needed
+
+                }
+            });
+
+
+            // --- Finalize and Save PDF ---
+            doc.save('resume.pdf'); // Save the document with a filename
+
+            // Turn off loading spinner
+            toggleButtonLoading('export-pdf-btn', false);
+        }
+
+
+    </script>
+</body>
+
+</html>
